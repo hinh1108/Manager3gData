@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="white">#FFffffff</color>
+    <color name="white_disabled">#9bffffff</color>
+    <color name="header_background">#3aebdb </color>
+    <color name="tabs_background">#EE9A49</color>
+    <color name="top_backgroud">#8B0A50</color>
+    <color name="color_1">#FFffcdd2</color>
+    <color name="color_2">#FFf8bbd0</color>
+    <color name="color_3">#FFe1bee7</color>
+    <color name="color_4">#FFbbdefb</color>
+    <color name="color_5">#FFf0f4c3</color>
+    <color name="color_6">#FFffe0b2</color>
+    <color name="color_7">#FFd7ccc8</color>
+    <color name="color_8">#FFcfd8dc</color>
+
+    <array name="fragment_colors">
+        <item>@color/color_3</item>
+        <item>@color/color_4</item>
+        <item>@color/color_5</item>
+        <item>@color/color_6</item>
+        <item>@color/color_7</item>
+        <item>@color/color_8</item>
+    </array>
+
+    <color name="colorPrimary">#FFEC8B</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorLightGoldenrod1">#EE9A49</color>
+    <color name="colorGreenYellow">#FFEC8B</color>
+</resources>

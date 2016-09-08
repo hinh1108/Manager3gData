@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabs_height"
+        android:background="@color/top_backgroud"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        >
+        <ImageView
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_smart3g"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="italic"
+                android:textSize="20dp"
+                android:textColor="@color/colorLightGoldenrod1"
+                android:text="Smart3G"/>
+            <CheckBox
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:paddingRight="10dp"
+                android:id="@+id/toggel"
+                android:button="@drawable/toggel_btn"
+
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+    <ru.noties.scrollable.ScrollableLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/scrollable_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:scrollable_autoMaxScroll="true"
+        app:scrollable_autoMaxScrollViewId="@+id/header"
+        app:scrollable_closeUpAnimationMillis="250"
+        app:scrollable_closeUpAnimatorInterpolator="@android:anim/accelerate_decelerate_interpolator"
+        app:scrollable_considerIdleMillis="125"
+        app:scrollable_defaultCloseUp="true"
+        app:scrollable_friction="0.075"
+        app:scrollable_scrollerFlywheel="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_height"
+                android:background="@color/header_background"
+                android:gravity="center"
+                android:text="Header"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
+
+            <com.app.hinh.smart3g.layout.TabsLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/tabs_height"
+                android:background="@color/tabs_background"
+                android:weightSum="1.0"/>
+
+        </LinearLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/tabs_height" />
+
+    </ru.noties.scrollable.ScrollableLayout>
+</LinearLayout>

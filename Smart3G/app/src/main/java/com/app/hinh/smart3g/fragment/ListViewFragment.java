@@ -12,7 +12,7 @@ import android.widget.ListView;
 
 import com.app.hinh.smart3g.R;
 import com.app.hinh.smart3g.adapter.AppListAdapter;
-import com.app.hinh.smart3g.model.PackageInfoApp;
+import com.app.hinh.smart3g.model.ApplicationInforNew;
 import com.app.hinh.smart3g.util.BlockUtils;
 
 import java.util.List;
@@ -25,8 +25,8 @@ public class ListViewFragment extends BaseFragment {
     public static final String TAG = "tag.ListViewFragment";
     private AppListAdapter mAdapter = null;
     private Context context;
-    private List<PackageInfoApp> installedList;
-    public static ListViewFragment newInstance(int color,Context context,List<PackageInfoApp> installedList) {
+    private List<ApplicationInforNew> installedList;
+    public static ListViewFragment newInstance(int color,Context context,List<ApplicationInforNew> installedList) {
         final Bundle bundle = new Bundle();
         bundle.putInt(ARG_COLOR, color);
 
@@ -35,7 +35,7 @@ public class ListViewFragment extends BaseFragment {
         return fragment;
     }
     @SuppressLint("ValidFragment")
-    public ListViewFragment(Context context,List<PackageInfoApp> installedList) {
+    public ListViewFragment(Context context,List<ApplicationInforNew> installedList) {
         this.installedList=installedList;
         this.context=context;
     }

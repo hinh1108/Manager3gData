@@ -16,6 +16,8 @@
     <color name="color_8">#FFcfd8dc</color>
 
     <array name="fragment_colors">
+        <item>@color/color_1</item>
+        <item>@color/color_2</item>
         <item>@color/color_3</item>
         <item>@color/color_4</item>
         <item>@color/color_5</item>

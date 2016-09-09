@@ -2,6 +2,7 @@ package com.app.hinh.smart3g.ui;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -17,7 +18,7 @@ import com.app.hinh.smart3g.fragment.BaseFragment;
 import com.app.hinh.smart3g.fragment.ConfigurationFragment;
 import com.app.hinh.smart3g.fragment.ListViewFragment;
 import com.app.hinh.smart3g.layout.TabsLayout;
-import com.app.hinh.smart3g.model.PackageInfoApp;
+import com.app.hinh.smart3g.model.ApplicationInforNew;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,7 +36,10 @@ public class MainActivity extends BaseActivity {
     private ScrollableLayout mScrollableLayout;
     private DatabaseManager databaseManager;
     private  List<PackageInfo> appList;
-    private List<PackageInfoApp> installedList;
+    private List<ApplicationInfo> applists;
+    private List<ApplicationInforNew> installedList;
+    private PackageManager packageManager = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,28 +50,27 @@ public class MainActivity extends BaseActivity {
 
         mScrollableLayout = findView(R.id.scrollable_layout);
         mScrollableLayout.setDraggableView(tabs);
-
+        packageManager = getPackageManager();
         //list app
         databaseManager=new DatabaseManager(MainActivity.this);
-        appList = getPackageManager().getInstalledPackages(0);
-        installedList = new ArrayList<PackageInfoApp>();
+        applists = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
+        installedList = new ArrayList<ApplicationInforNew>();
         double data=0;
-        PackageInfoApp packageInfoApp;
-        for (PackageInfo packageInfo : appList) {
+        ApplicationInforNew applicationInforNew;
+        for (ApplicationInfo applicationInfo : applists) {
 
-            if (!isSystemPackage(packageInfo) && !getApplicationInfo().packageName.equals(packageInfo.packageName)) {
 
-                if (!databaseManager.constain(packageInfo.applicationInfo.uid)) {
+                if (!databaseManager.constain(applicationInfo.uid)) {
                     data=0;
-                    packageInfoApp=new PackageInfoApp(packageInfo,data);
-                    databaseManager.insertManager3g(packageInfo.applicationInfo.uid, data);
-                    installedList.add(packageInfoApp);
+                    applicationInforNew=new ApplicationInforNew(applicationInfo,data);
+                    databaseManager.insertManager3g(applicationInfo.uid, data);
+                    installedList.add(applicationInforNew);
                 }
                 else {
-                    data=databaseManager.dataUID(packageInfo.applicationInfo.uid);
-                    packageInfoApp=new PackageInfoApp(packageInfo,data);
-                    installedList.add(packageInfoApp);
-                }
+                    data=databaseManager.dataUID(applicationInfo.uid);
+                    applicationInforNew=new ApplicationInforNew(applicationInfo,data);
+                    installedList.add(applicationInforNew);
+
             }
         }
         Cursor cursor = databaseManager.getListManager3g();
@@ -123,9 +126,7 @@ public class MainActivity extends BaseActivity {
     }
 
     //
-    private boolean isSystemPackage(PackageInfo packageInfo) {
-        return (packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -159,7 +160,21 @@ public class MainActivity extends BaseActivity {
         return list;
     }
 
+    //check app
+    private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
+        ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+        for (ApplicationInfo info : list) {
+            try {
+                if (null != packageManager.getLaunchIntentForPackage(info.packageName)) {
+                    applist.add(info);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
+        return applist;
+    }
 
 
 }

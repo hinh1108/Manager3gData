@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.app.hinh.smart3g.R;
-import com.app.hinh.smart3g.model.PackageInfoApp;
+import com.app.hinh.smart3g.model.ApplicationInforNew;
 import com.app.hinh.smart3g.ui.BlockUtils;
 
 import java.util.ArrayList;
@@ -22,12 +22,12 @@ import java.util.List;
 public class AppListAdapter extends BaseAdapter {
 
     private Context mInstance;
-    private List<PackageInfoApp> mInstalledList = null;
+    private List<ApplicationInforNew> mInstalledList = null;
     private ArrayList<String> mCheckedList = null;
     private LayoutInflater layoutInflater;
     private double dataMB=0;
     private double dataKB=0;
-    public AppListAdapter(Context instance, int item_istall_apilication, List<PackageInfoApp> installedList, ArrayList<String> checkedList) {
+    public AppListAdapter(Context instance, int item_istall_apilication, List<ApplicationInforNew> installedList, ArrayList<String> checkedList) {
         mInstance = instance;
 
         mInstalledList = installedList;
@@ -72,26 +72,26 @@ public class AppListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        final PackageInfoApp packageInfoApp = mInstalledList.get(position);
-        holder.textView.setText(packageInfoApp.getPackageInfo().applicationInfo.loadLabel(mInstance.getPackageManager()).toString());
+        final ApplicationInforNew applicationInforNew = mInstalledList.get(position);
+        holder.textView.setText(applicationInforNew.getApplicationInfo().loadLabel(mInstance.getPackageManager()).toString());
 
-        String a=packageInfoApp.getPackageInfo().applicationInfo.loadLabel(mInstance.getPackageManager()).toString();
+        String a=applicationInforNew.getApplicationInfo().loadLabel(mInstance.getPackageManager()).toString();
         // thay doi kich thuoc 1 lan;
         final int iconSize = Math.round(32*mInstance.getResources().getDisplayMetrics().density);
         //Thiết lập Drawables (nếu có) để xuất hiện bên trái của, trên, bên phải, và bên dưới văn bản.
 
         //app.icon;
         Bitmap bitmap=Bitmap.createScaledBitmap(
-                ((BitmapDrawable) packageInfoApp.getPackageInfo().applicationInfo.loadIcon(mInstance.getPackageManager())).getBitmap(), iconSize, iconSize, true);
+                ((BitmapDrawable) applicationInforNew.getApplicationInfo().loadIcon(mInstance.getPackageManager())).getBitmap(), iconSize, iconSize, true);
 
         holder.imageView.setImageBitmap( bitmap);
-        if (packageInfoApp.getData()/(1024*1024)>=1){
-            dataMB=Math.round(packageInfoApp.getData()/(1024*1024));
+        if (applicationInforNew.getData()/(1024*1024)>=1){
+            dataMB=Math.round((applicationInforNew.getData()*100)/(1024*1024))/100;
             holder.tvData.setText(String.valueOf(dataMB)+" MB");
 
         }
         else {
-            dataKB=Math.round(packageInfoApp.getData()/(1024));
+            dataKB=Math.round(applicationInforNew.getData()/(1024));
             holder.tvData.setText(String.valueOf(dataKB)+" KB");
 
         }
@@ -103,7 +103,7 @@ public class AppListAdapter extends BaseAdapter {
 
 
         
-        if (contains(mCheckedList, packageInfoApp)) {
+        if (contains(mCheckedList, applicationInforNew)) {
             holder.checkBox.setChecked(true);
         } else {
             holder.checkBox.setChecked(false);
@@ -130,11 +130,11 @@ public class AppListAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public void updateCheckedList(PackageInfoApp packageInfoApp){
-        if (contains(mCheckedList, packageInfoApp)) {
-            remove(mCheckedList, packageInfoApp);
+    public void updateCheckedList(ApplicationInforNew applicationInforNew){
+        if (contains(mCheckedList, applicationInforNew)) {
+            remove(mCheckedList, applicationInforNew);
         } else {
-            mCheckedList.add(packageInfoApp.getPackageInfo().packageName);
+            mCheckedList.add(applicationInforNew.getApplicationInfo().packageName);
         }
 
         BlockUtils.save(mInstance, mCheckedList);
@@ -142,14 +142,14 @@ public class AppListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    private boolean contains(ArrayList<String> list, PackageInfoApp item) {
+    private boolean contains(ArrayList<String> list, ApplicationInforNew item) {
         if (list == null || item == null) {
             return false;
         }
 
         for (int i = 0; i < list.size(); i++) {
 
-            if (list.get(i).equals(item.getPackageInfo().packageName)) {
+            if (list.get(i).equals(item.getApplicationInfo().packageName)) {
                 return true;
             }
         }
@@ -157,14 +157,14 @@ public class AppListAdapter extends BaseAdapter {
         return false;
     }
 
-    private void remove(ArrayList<String> list, PackageInfoApp item) {
+    private void remove(ArrayList<String> list, ApplicationInforNew item) {
         if (list == null || item == null) {
             return;
         }
 
         for (int i = 0; i < list.size(); i++) {
 
-            if (list.get(i).equals(item.getPackageInfo().packageName)) {
+            if (list.get(i).equals(item.getApplicationInfo().packageName)) {
                 list.remove(i);
                 break;
             }

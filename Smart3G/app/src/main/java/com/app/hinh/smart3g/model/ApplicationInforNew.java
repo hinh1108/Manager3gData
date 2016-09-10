@@ -1,12 +1,11 @@
 package com.app.hinh.smart3g.model;
 
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 
 /**
  * Created by hinh1 on 9/7/2016.
  */
-public class ApplicationInforNew extends PackageInfo{
+public class ApplicationInforNew extends ApplicationInfo{
     private double data=0;
     private ApplicationInfo applicationInfo;
     public ApplicationInforNew(ApplicationInfo applicationInfo, double data) {

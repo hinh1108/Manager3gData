@@ -15,8 +15,7 @@ public class BlockUtils {
 
     /**
      *
-     *
-     * @param instance
+     *  @param instance
      * @param serviceClass
      */
     public static boolean isBlockServiceRunning(Activity instance, Class<?> serviceClass) {

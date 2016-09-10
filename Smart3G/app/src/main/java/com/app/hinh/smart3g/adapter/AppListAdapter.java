@@ -1,7 +1,7 @@
 package com.app.hinh.smart3g.adapter;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
+import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.app.hinh.smart3g.R;
 import com.app.hinh.smart3g.model.ApplicationInforNew;
-import com.app.hinh.smart3g.ui.BlockUtils;
+import com.app.hinh.smart3g.util.BlockUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +44,8 @@ public class AppListAdapter extends BaseAdapter {
     }
 
     @Override
-    public PackageInfo getItem(int arg0) {
-        return mInstalledList.get(arg0);
+    public ApplicationInfo getItem(int arg0) {
+        return mInstalledList.get(arg0).getApplicationInfo();
     }
 
     @Override

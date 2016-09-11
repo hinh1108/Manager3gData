@@ -16,14 +16,12 @@ import com.app.hinh.smart3g.database.DatabaseManager;
  */
 public class TotalDataService extends Service {
     private static final int delayMillis = 5000;
-    private static final String DB_NAME="manager3g";
-    private static final String TB_DAYS="managerdays";
-    private static final String TB_TOTAL="manager3g";
+
     private double tx;
     private double rx;
     private Handler mHandler;
     private double[] firtdata;
-
+    private double[] firtDataMobile;
 
     @Nullable
     @Override
@@ -34,33 +32,24 @@ public class TotalDataService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        firtdata=new double[size()];
+        firtDataMobile=new double[size()];
         mHandler = new Handler();
+        addFirtData();
         mHandler.postDelayed(mRunnable, delayMillis);
+
+        //mHandler.postDelayed(mRunnable, delayMillis);
+
     }
     private double firt=0;
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            firtdata=new double[size()];
-            addFirtData();
-            size();
-            Cursor cursor = DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
 
-            int uid;
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-                uid = cursor.getInt(0);
-                firt=firtdata[i];
-                firtdata[i]=totalData(uid);
-                DatabaseManager.getDatabaseManager(TotalDataService.this).updateManager3g(uid,firtdata[i]-firt);
-                //Log.d("AAAAAA "+String.valueOf(i),String.valueOf(firtdata[i]-firt));
-            }
-            cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
-            for (int i = 0; i < cursor.getCount(); i++) {
-                cursor.moveToPosition(i);
-                Log.d("AAAAAA "+String.valueOf(i),String.valueOf(cursor.getDouble(1)));
-            }
+
+            updateData();
             mHandler.postDelayed(mRunnable, delayMillis);
+
 
 
         }
@@ -74,18 +63,30 @@ public class TotalDataService extends Service {
     @Override
     public void onDestroy() {
         mHandler.removeCallbacks(mRunnable);
+        updateData();
         DatabaseManager.getDatabaseManager(TotalDataService.this).close();
 
         super.onDestroy();
     }
     public void addFirtData(){
         int uid;
-        Cursor cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
-        for (int i = 0; i < cursor.getCount(); i++) {
-            cursor.moveToPosition(i);
-            uid = cursor.getInt(0);
-            firtdata[i]=totalData(uid);
+        Cursor cursor = null;
+        try {
+            cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+                uid = cursor.getInt(0);
+                firtdata[i]=totalData(uid);
+                firtDataMobile[i]=cursor.getDouble(1);
+            }
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if(cursor != null)
+                cursor.close();
         }
+        //Cursor cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
+
     }
     public double totalData(int uid){
 
@@ -101,13 +102,52 @@ public class TotalDataService extends Service {
     }
 
     public int size(){
-        Cursor cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
-        Log.d("FUCK",String.valueOf(cursor.getCount()));
+        int count=0;
 
-        return cursor.getCount();
+        Cursor cursor = null;
+        try {
+            cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
+            Log.d("FUCK",String.valueOf(cursor.getCount()));
+            count=cursor.getCount();
+
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if(cursor != null)
+                cursor.close();
+        }
+
+        return count;
     }
-  /*  public void updateManager3g(int UID,double data){
+    public void updateData(){
+        Cursor cursor = null;
+        try {
+            cursor =DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
+            int uid;
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+                uid = cursor.getInt(0);
+                firt=firtdata[i];
+                DatabaseManager.getDatabaseManager(TotalDataService.this).updateManager3g(uid,totalData(uid)-firt+firtDataMobile[i]);
+                //Log.d("AAAAAA "+String.valueOf(i),String.valueOf(firtdata[i]-firt));
+            }
 
+            cursor=DatabaseManager.getDatabaseManager(TotalDataService.this).getListManager3g();
+            for (int i = 0; i < cursor.getCount(); i++) {
+                cursor.moveToPosition(i);
+                Log.d("AAAAAA "+String.valueOf(i),String.valueOf(cursor.getDouble(1)));
+            }
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if(cursor != null)
+                cursor.close();
+        }
+
+
+
+    }
+ /* public void updateManager3g(int UID,double data){
         String whereClause = "UID = ? ";
         String[] whereArgs = new String[] {
                 String.valueOf(UID)
@@ -119,5 +159,6 @@ public class TotalDataService extends Service {
         ContentValues values=new ContentValues();
         values.put("DATA",data+datafirt);
         database.update(TB_TOTAL,values,"UID="+UID,null);
-    }*/
+    }
+ */
 }

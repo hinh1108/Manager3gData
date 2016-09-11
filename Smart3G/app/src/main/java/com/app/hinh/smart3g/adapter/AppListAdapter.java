@@ -86,7 +86,7 @@ public class AppListAdapter extends BaseAdapter {
 
         holder.imageView.setImageBitmap( bitmap);
         if (applicationInforNew.getData()/(1024*1024)>=1){
-            dataMB=Math.round((applicationInforNew.getData()*100)/(1024*1024))/100;
+            dataMB=(Math.round((applicationInforNew.getData()/(1024*1024))*100))/100;
             holder.tvData.setText(String.valueOf(dataMB)+" MB");
 
         }

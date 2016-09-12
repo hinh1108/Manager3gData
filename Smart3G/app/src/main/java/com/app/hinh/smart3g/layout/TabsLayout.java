@@ -2,6 +2,7 @@ package com.app.hinh.smart3g.layout;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -120,7 +121,11 @@ public class TabsLayout extends HorizontalScrollView {
     public void setItemSelected(int position) {
         final int count = mContainer.getChildCount();
         for (int i = 0; i < count; i++) {
+            mContainer.getChildAt(i).setBackgroundColor(Color.parseColor("#EE9A49"));
+
             mContainer.getChildAt(i).setSelected(i == position);
+
         }
+        mContainer.getChildAt(position).setBackgroundColor(Color.parseColor("#8B0A50"));
     }
 }

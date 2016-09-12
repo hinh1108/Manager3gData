@@ -2,68 +2,77 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
     android:gravity="center"
-    android:paddingBottom="5dip"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/activity_horizontal_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="5dip">
+    android:paddingRight="10dp"
+    android:paddingTop="@dimen/activity_horizontal_margin">
+
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/iconApp"/>
+        android:id="@+id/iconApp"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvAppName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <TextView
+                android:id="@+id/tvData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@+id/tvAppName"
+                android:gravity="right"
+                android:text="0MB" />
+
+        </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:paddingLeft="10dp"
-                    android:id="@+id/tvAppName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Title"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-                <TextView
-                    android:paddingRight="10dp"
-                    android:id="@+id/tvData"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0MB"
-                    android:gravity="right"
-                    android:layout_toRightOf="@+id/tvAppName"
-                    android:layout_alignParentRight="true" />
-
-            </RelativeLayout>
-
+            android:background="@color/colorWhite">
+            <View
+                android:id="@+id/drawLine"
+                android:layout_width="100dp"
+                android:layout_height="7px"
+                android:background="@color/top_backgroud" />
         </LinearLayout>
 
 
-       <!-- <TextView
-            android:id="@+id/tvAppTraffic"
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:gravity="center"
-            android:text="0 Kb"
-            android:textAppearance="?android:attr/textAppearanceSmall" />-->
+        <!-- <TextView
+             android:id="@+id/tvAppTraffic"
+             android:layout_width="match_parent"
+             android:layout_height="32dp"
+             android:layout_alignParentEnd="true"
+             android:layout_alignParentRight="true"
+             android:layout_alignParentTop="true"
+             android:gravity="center"
+             android:text="0 Kb"
+             android:textAppearance="?android:attr/textAppearanceSmall" />-->
     </LinearLayout>
 
     <CheckBox
+        android:id="@+id/check"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:id="@+id/check"
         android:button="@drawable/checkbox_btn"
+        android:layout_marginLeft="10dp"
         android:clickable="false"
-        android:focusable="false"/>
+        android:focusable="false" />
 </LinearLayout>

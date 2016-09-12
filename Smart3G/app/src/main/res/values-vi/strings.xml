@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">Smart3G</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="fragment_setting3g">Dữ Liệu</string>
+    <string name="fragment_app">Ứng Dụng</string>
+    <string name="to">Tới</string>
+    <string name="firtDate">Ngày Bắt Đầu</string>
+    <string name="lastDate">Ngày Kết Thúc</string>
+    <string name="of">Của</string>
+    <string name="setupLimit">Đặt giới hạn dữ liệu di động</string>
+
+</resources>

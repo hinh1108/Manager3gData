@@ -31,24 +31,27 @@ import com.app.hinh.smart3g.util.TopActivityUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import ru.noties.scrollable.CanScrollVerticallyDelegate;
 import ru.noties.scrollable.OnFlingOverListener;
 import ru.noties.scrollable.OnScrollChangedListener;
 import ru.noties.scrollable.ScrollableLayout;
 
-public class MainActivity extends BaseActivity  {
+public class MainActivity extends BaseActivity {
 
     private static final String ARG_LAST_SCROLL_Y = "arg.LastScrollY";
     private static final int REQUEST_SETTING = 1;
     private ScrollableLayout mScrollableLayout;
     private DatabaseManager databaseManager;
-    private  List<PackageInfo> appList;
+    private List<PackageInfo> appList;
     private List<ApplicationInfo> applists;
     private List<ApplicationInforNew> installedList;
     private PackageManager packageManager = null;
     private CheckBox startBlock;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,32 +59,45 @@ public class MainActivity extends BaseActivity  {
 
         final View header = findViewById(R.id.header);
         final TabsLayout tabs = findView(R.id.tabs);
-        startBlock = (CheckBox)findViewById(R.id.toggel);
+        startBlock = (CheckBox) findViewById(R.id.toggel);
+
         mScrollableLayout = findView(R.id.scrollable_layout);
         mScrollableLayout.setDraggableView(tabs);
         packageManager = getPackageManager();
         //list app
-        databaseManager=new DatabaseManager(MainActivity.this);
+        databaseManager = new DatabaseManager(MainActivity.this);
         applists = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
         installedList = new ArrayList<ApplicationInforNew>();
-        double data=0;
+        TreeSet<ApplicationInforNew> applicationInforNewTreeSet = new TreeSet<ApplicationInforNew>(new Comparator<ApplicationInforNew>() {
+            @Override
+            public int compare(ApplicationInforNew a1, ApplicationInforNew a2) {
+                return a1.compareTo(a2);
+            }
+        });
+        double data = 0;
         ApplicationInforNew applicationInforNew;
         for (ApplicationInfo applicationInfo : applists) {
 
 
-                if (!databaseManager.constain(applicationInfo.uid)) {
-                    data=0;
-                    applicationInforNew=new ApplicationInforNew(applicationInfo,data);
-                    databaseManager.insertManager3g(applicationInfo.uid, data);
-                    installedList.add(applicationInforNew);
-                }
-                else {
-                    data=databaseManager.dataUID(applicationInfo.uid);
-                    applicationInforNew=new ApplicationInforNew(applicationInfo,data);
-                    installedList.add(applicationInforNew);
+            if (!databaseManager.constain(applicationInfo.uid)) {
+                data = 0;
+                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
+                databaseManager.insertManager3g(applicationInfo.uid, data);
+                //installedList.add(applicationInforNew);
+                applicationInforNewTreeSet.add(applicationInforNew);
+
+            } else {
+                data = databaseManager.dataUID(applicationInfo.uid);
+                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
+                //installedList.add(applicationInforNew);
+                applicationInforNewTreeSet.add(applicationInforNew);
 
             }
         }
+        Log.d("size tree set", String.valueOf(applicationInforNewTreeSet.size()));
+
+        sortAppData(applicationInforNewTreeSet);
+
 
         Cursor cursor = databaseManager.getListManager3g();
         Log.d("SIZE", String.valueOf(cursor.getCount()));
@@ -118,7 +134,7 @@ public class MainActivity extends BaseActivity  {
 
                 tabs.setTranslationY(tabsTranslationY);
 
-                header.setTranslationY(y/2 );
+                header.setTranslationY(y / 2);
             }
         });
 
@@ -131,32 +147,32 @@ public class MainActivity extends BaseActivity  {
                 }
             });
         }
-        if(BlockUtils.isBlockServiceRunning(MainActivity.this, CoreSevice.class)){
+        if (BlockUtils.isBlockServiceRunning(MainActivity.this, CoreSevice.class)) {
             startBlock.setChecked(true);
-        }else{
+        } else {
             startBlock.setChecked(false);
         }
         startBlock.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-               if(b == true){
-                   Intent intent = new Intent();
-                   intent.setClass(MainActivity.this, CoreSevice.class);
-                   MainActivity.this.startService(intent);
-                   if(!TopActivityUtils.isStatAccessPermissionSet(MainActivity.this)){
+                if (b == true) {
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, CoreSevice.class);
+                    MainActivity.this.startService(intent);
+                    if (!TopActivityUtils.isStatAccessPermissionSet(MainActivity.this)) {
                         showDialog();
-                   }else {
-                       Intent intent1 = new Intent();
-                       intent1.setClass(MainActivity.this, CoreSevice.class);
-                       MainActivity.this.startService(intent1);
-                   }
+                    } else {
+                        Intent intent1 = new Intent();
+                        intent1.setClass(MainActivity.this, CoreSevice.class);
+                        MainActivity.this.startService(intent1);
+                    }
 
-               }else if(b == false) {
-                   Intent intent1 = new Intent();
-                   intent1.setClass(MainActivity.this, CoreSevice.class);
-                   MainActivity.this.stopService(intent1);
+                } else if (b == false) {
+                    Intent intent1 = new Intent();
+                    intent1.setClass(MainActivity.this, CoreSevice.class);
+                    MainActivity.this.stopService(intent1);
 
-               }
+                }
             }
 
         });
@@ -165,7 +181,7 @@ public class MainActivity extends BaseActivity  {
 
     //
 
-    private void showDialog(){
+    private void showDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("NOTE")
                 .setMessage("Android 5.0 trở lên không cho phép quyền truy cập ứng dụng mời bạn vào cài đặt thiết lập lại quyền")
@@ -186,6 +202,7 @@ public class MainActivity extends BaseActivity  {
                     }
                 }).show();
     }
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putInt(ARG_LAST_SCROLL_Y, mScrollableLayout.getScrollY());
@@ -202,7 +219,7 @@ public class MainActivity extends BaseActivity  {
         ListViewFragment listViewFragment
                 = (ListViewFragment) manager.findFragmentByTag(ListViewFragment.TAG);
         if (listViewFragment == null) {
-            listViewFragment = ListViewFragment.newInstance(colorRandomizer.next(),MainActivity.this,installedList);
+            listViewFragment = ListViewFragment.newInstance(colorRandomizer.next(), MainActivity.this, installedList);
         }
 
         ConfigurationFragment configurationFragment
@@ -210,7 +227,6 @@ public class MainActivity extends BaseActivity  {
         if (configurationFragment == null) {
             configurationFragment = ConfigurationFragment.newInstance(colorRandomizer.next());
         }
-
 
 
         Collections.addAll(list, listViewFragment, configurationFragment);
@@ -233,6 +249,7 @@ public class MainActivity extends BaseActivity  {
 
         return applist;
     }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -250,6 +267,14 @@ public class MainActivity extends BaseActivity  {
             }
         }
     }
+
+    public void sortAppData(TreeSet<ApplicationInforNew> applicationInforNewTreeSet) {
+        while (!applicationInforNewTreeSet.isEmpty()) {
+            installedList.add(applicationInforNewTreeSet.pollLast());
+        }
+
+    }
+
 
 
 }

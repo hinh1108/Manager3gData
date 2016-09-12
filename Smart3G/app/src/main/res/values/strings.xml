@@ -8,5 +8,11 @@
 
     <string name="fragment_setting3g">Dữ Liệu</string>
     <string name="fragment_app">Ứng Dụng</string>
+    <string name="firtDate">Ngày Bắt Đầu</string>
+    <string name="lastDate">Ngày Kết Thúc</string>
+    <string name="of">Của</string>
+    <string name="to">Tới</string>
+    <string name="setupLimit">Đặt giới hạn dữ liệu di động</string>
+
 
 </resources>

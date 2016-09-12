@@ -5,7 +5,7 @@ import android.content.pm.ApplicationInfo;
 /**
  * Created by hinh1 on 9/7/2016.
  */
-public class ApplicationInforNew extends ApplicationInfo{
+public class ApplicationInforNew extends ApplicationInfo implements Comparable<ApplicationInforNew>{
     private double data=0;
     private ApplicationInfo applicationInfo;
     public ApplicationInforNew(ApplicationInfo applicationInfo, double data) {
@@ -28,5 +28,22 @@ public class ApplicationInforNew extends ApplicationInfo{
 
     public void setData(double data) {
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    @Override
+    public int compareTo(ApplicationInforNew applicationInforNew) {
+        if (this.getApplicationInfo().uid==applicationInforNew.getApplicationInfo().uid)
+            return 0;
+        else {
+            if (this.getData() > applicationInforNew.getData())
+                return 1;
+            else
+                return -1;
+        }
     }
 }

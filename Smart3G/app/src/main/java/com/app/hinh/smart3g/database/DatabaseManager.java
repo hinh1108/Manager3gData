@@ -87,7 +87,7 @@ public class DatabaseManager {
 
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
-            String creadTableDays = "CREATE TABLE IF NOT EXISTS managerdays(UID INT,DAY TEXT,DATA DOUBLE)";
+            String creadTableDays = "CREATE TABLE IF NOT EXISTS managerdays(DATE TEXT PRIMARY KEY,DATA DOUBLE)";
             String createTableHuors = "CREATE TABLE IF NOT EXISTS manager3g(UID INT, DATA DOUBLE)";
             sqLiteDatabase.execSQL(creadTableDays);
             sqLiteDatabase.execSQL(createTableHuors);

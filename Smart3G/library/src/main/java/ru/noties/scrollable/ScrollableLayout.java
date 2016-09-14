@@ -137,7 +137,6 @@ public class ScrollableLayout extends FrameLayout {
     private CloseUpIdleAnimationTime mCloseUpIdleAnimationTime;
     private CloseUpAnimatorConfigurator mCloseAnimatorConfigurator;
 
-    private View mDraggableView;
     private boolean mIsDraggingDraggable;
     private final Rect mDraggableRect;
     {
@@ -526,14 +525,8 @@ public class ScrollableLayout extends FrameLayout {
         return y;
     }
 
-    /**
-     * Sets View which should be included in receiving scroll gestures.
-     * Maybe be null
-     * @param view you wish to include in scrolling gestures (aka tabs)
-     */
-    public void setDraggableView(View view) {
-        mDraggableView = view;
-    }
+
+
 
     @Override
     public boolean dispatchTouchEvent(@SuppressWarnings("NullableProblems") MotionEvent event) {
@@ -554,13 +547,7 @@ public class ScrollableLayout extends FrameLayout {
             mIsTouchOngoing = true;
             mScroller.abortAnimation();
 
-            if (mDraggableView != null && mDraggableView.getGlobalVisibleRect(mDraggableRect)) {
-                final int x = (int) (event.getRawX() + .5F);
-                final int y = (int) (event.getRawY() + .5F);
-                mIsDraggingDraggable = mDraggableRect.contains(x, y);
-            } else {
-                mIsDraggingDraggable = false;
-            }
+
         } else if (action == MotionEvent.ACTION_UP
                 || action == MotionEvent.ACTION_CANCEL){
 

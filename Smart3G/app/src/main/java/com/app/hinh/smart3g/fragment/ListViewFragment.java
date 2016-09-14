@@ -26,9 +26,8 @@ public class ListViewFragment extends BaseFragment {
     private AppListAdapter mAdapter = null;
     private Context context;
     private List<ApplicationInforNew> installedList;
-    public static ListViewFragment newInstance(int color,Context context,List<ApplicationInforNew> installedList) {
+    public static ListViewFragment newInstance(Context context,List<ApplicationInforNew> installedList) {
         final Bundle bundle = new Bundle();
-        bundle.putInt(ARG_COLOR, color);
 
         final ListViewFragment fragment = new ListViewFragment(context,installedList);
         fragment.setArguments(bundle);

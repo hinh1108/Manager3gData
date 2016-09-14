@@ -7,16 +7,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/tabs_height"
-        android:background="@color/top_backgroud"
+        android:background="@color/Green3"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         >
-        <ImageView
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_smart3g"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -58,24 +53,38 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@color/Green3"
+            >
+            <include
+                android:id="@+id/header"
 
-            <TextView
+                layout="@layout/setting_3g">
+
+            </include>
+            <!--<android.support.v4.view.ViewPager
                 android:id="@+id/header"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/header_height"
-                android:background="@color/header_background"
+                android:layout_height="400dp"
+                />-->
+
+            <!--<TextView
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
                 android:gravity="center"
                 android:text="Header"
                 android:textColor="@color/white"
-                android:textSize="30sp" />
-
-            <com.app.hinh.smart3g.layout.TabsLayout
-                android:id="@+id/tabs"
+                android:textSize="30sp" />-->
+           <TextView
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/tabs_height"
-                android:background="@color/tabs_background"
-                android:weightSum="1.0"/>
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:background="@color/Green4"
+                android:text="Bạn là người dùng 3g thông minh!!"
+                android:gravity="center"
+                android:textColor="@color/colorWhite"/>
+
 
         </LinearLayout>
 

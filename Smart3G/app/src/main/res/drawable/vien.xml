@@ -10,7 +10,7 @@
     <!-- d?t thu?c tính màu và d? r?ng c?a du?ng vi?n -->
     <stroke
         android:width="1px"
-        android:color="@color/top_backgroud" >
+        android:color="@color/Green3" >
     </stroke>
 
     <!-- các thu?c tính can ch?nh-->

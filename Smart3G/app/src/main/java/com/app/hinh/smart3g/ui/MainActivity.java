@@ -3,7 +3,6 @@ package com.app.hinh.smart3g.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -18,12 +17,9 @@ import android.widget.Toast;
 
 import com.app.hinh.smart3g.R;
 import com.app.hinh.smart3g.adapter.ViewPagerAdapter;
-import com.app.hinh.smart3g.color.ColorRandomizer;
 import com.app.hinh.smart3g.database.DatabaseManager;
 import com.app.hinh.smart3g.fragment.BaseFragment;
-import com.app.hinh.smart3g.fragment.ConfigurationFragment;
 import com.app.hinh.smart3g.fragment.ListViewFragment;
-import com.app.hinh.smart3g.layout.TabsLayout;
 import com.app.hinh.smart3g.model.ApplicationInforNew;
 import com.app.hinh.smart3g.service.CoreSevice;
 import com.app.hinh.smart3g.util.BlockUtils;
@@ -46,7 +42,6 @@ public class MainActivity extends BaseActivity {
     private static final int REQUEST_SETTING = 1;
     private ScrollableLayout mScrollableLayout;
     private DatabaseManager databaseManager;
-    private List<PackageInfo> appList;
     private List<ApplicationInfo> applists;
     private List<ApplicationInforNew> installedList;
     private PackageManager packageManager = null;
@@ -58,11 +53,9 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         final View header = findViewById(R.id.header);
-        final TabsLayout tabs = findView(R.id.tabs);
         startBlock = (CheckBox) findViewById(R.id.toggel);
 
         mScrollableLayout = findView(R.id.scrollable_layout);
-        mScrollableLayout.setDraggableView(tabs);
         packageManager = getPackageManager();
         //list app
         databaseManager = new DatabaseManager(MainActivity.this);
@@ -106,7 +99,6 @@ public class MainActivity extends BaseActivity {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), getResources(), getFragments());
         viewPager.setAdapter(adapter);
 
-        tabs.setViewPager(viewPager);
 
         mScrollableLayout.setCanScrollVerticallyDelegate(new CanScrollVerticallyDelegate() {
             @Override
@@ -132,9 +124,8 @@ public class MainActivity extends BaseActivity {
                     tabsTranslationY = y - maxY;
                 }
 
-                tabs.setTranslationY(tabsTranslationY);
 
-                header.setTranslationY(y / 2);
+                header.setTranslationY(y/2);
             }
         });
 
@@ -212,24 +203,18 @@ public class MainActivity extends BaseActivity {
     private List<BaseFragment> getFragments() {
 
         final FragmentManager manager = getSupportFragmentManager();
-        final ColorRandomizer colorRandomizer = new ColorRandomizer(getResources().getIntArray(R.array.fragment_colors));
         final List<BaseFragment> list = new ArrayList<>();
 
 
         ListViewFragment listViewFragment
                 = (ListViewFragment) manager.findFragmentByTag(ListViewFragment.TAG);
         if (listViewFragment == null) {
-            listViewFragment = ListViewFragment.newInstance(colorRandomizer.next(), MainActivity.this, installedList);
-        }
-
-        ConfigurationFragment configurationFragment
-                = (ConfigurationFragment) manager.findFragmentByTag(ConfigurationFragment.TAG);
-        if (configurationFragment == null) {
-            configurationFragment = ConfigurationFragment.newInstance(colorRandomizer.next());
+            listViewFragment = ListViewFragment.newInstance(MainActivity.this, installedList);
         }
 
 
-        Collections.addAll(list, listViewFragment, configurationFragment);
+
+        Collections.addAll(list, listViewFragment);
 
         return list;
     }

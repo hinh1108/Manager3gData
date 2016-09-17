@@ -11,6 +11,9 @@ import android.util.Log;
 
 import com.app.hinh.smart3g.database.DatabaseManager;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by hinh1 on 8/24/2016.
  */
@@ -19,9 +22,15 @@ public class TotalDataService extends Service {
 
     private double tx;
     private double rx;
+    private double tx_mobile;
+    private double rx_mobile;
     private Handler mHandler;
     private double[] firtdata;
+    // data cua uid
     private double[] firtDataMobile;
+    private double lastData3g=0;
+    private double firt=0;
+    private double firtData3g=0;
 
     @Nullable
     @Override
@@ -35,18 +44,22 @@ public class TotalDataService extends Service {
         firtdata=new double[size()];
         firtDataMobile=new double[size()];
         mHandler = new Handler();
+        firtData3g=totalMobelData();
         addFirtData();
+
+
         mHandler.postDelayed(mRunnable, delayMillis);
+
 
         //mHandler.postDelayed(mRunnable, delayMillis);
 
     }
-    private double firt=0;
+
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
 
-
+            updateManagerDays();
             updateData();
             mHandler.postDelayed(mRunnable, delayMillis);
 
@@ -63,10 +76,32 @@ public class TotalDataService extends Service {
     @Override
     public void onDestroy() {
         mHandler.removeCallbacks(mRunnable);
+        updateManagerDays();
         updateData();
         DatabaseManager.getDatabaseManager(TotalDataService.this).close();
 
         super.onDestroy();
+    }
+
+    //updata data managerdays
+    public void updateManagerDays(){
+        Calendar calendar= Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String date = df.format(calendar.getTime());
+
+        Log.d("Date time",date);
+        lastData3g=totalMobelData();
+        if (!DatabaseManager.getDatabaseManager(TotalDataService.this).constainDate(date)){
+            DatabaseManager.getDatabaseManager(TotalDataService.this).insertManagerDays(date,totalMobelData()-firtData3g);
+            Log.d("Data",String.valueOf(lastData3g-firtData3g));
+        }
+        else {
+            //Log.d("Data",String.valueOf(totalMobelData()-firtData3g));
+            //Log.d("data day",String.valueOf(DatabaseManager.getDatabaseManager(TotalDataService.this).getDataDays(date)));
+            DatabaseManager.getDatabaseManager(TotalDataService.this).updateManagerDays(date,totalMobelData() - firtData3g + DatabaseManager.getDatabaseManager(TotalDataService.this).getDataDays(date));
+
+        }
+        firtData3g=lastData3g;
     }
     public void addFirtData(){
         int uid;
@@ -100,7 +135,12 @@ public class TotalDataService extends Service {
 
 
     }
-
+    //tinh tong mobile data
+    public double totalMobelData(){
+        tx_mobile=TrafficStats.getMobileTxBytes();
+        rx_mobile=TrafficStats.getTotalRxBytes();
+        return tx_mobile+rx_mobile;
+    }
     public int size(){
         int count=0;
 

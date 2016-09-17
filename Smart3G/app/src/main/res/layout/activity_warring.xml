@@ -26,18 +26,11 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/Green4"
             android:text="OK"
-            android:textColor="@color/colorWhite"
-            android:visibility="gone"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:text="Cancel"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/colorWhite"
-            android:visibility="gone"/>
+            android:onClick="openListBlock"
+            android:textColor="@color/colorWhite" />
+
 
     </LinearLayout>
 

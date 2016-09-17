@@ -11,8 +11,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.hinh.smart3g.R;
@@ -21,11 +24,14 @@ import com.app.hinh.smart3g.database.DatabaseManager;
 import com.app.hinh.smart3g.fragment.BaseFragment;
 import com.app.hinh.smart3g.fragment.ListViewFragment;
 import com.app.hinh.smart3g.model.ApplicationInforNew;
+import com.app.hinh.smart3g.model.ItemSpinner;
 import com.app.hinh.smart3g.service.CoreSevice;
 import com.app.hinh.smart3g.util.BlockUtils;
 import com.app.hinh.smart3g.util.TopActivityUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -46,19 +52,28 @@ public class MainActivity extends BaseActivity {
     private List<ApplicationInforNew> installedList;
     private PackageManager packageManager = null;
     private CheckBox startBlock;
+    private TextView totalData;
+    private ArrayList<ItemSpinner> itemList;
+    private ArrayList<String> itemString;
+    private Spinner settingdate;
+    private ArrayAdapter<String> spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        itemString=new ArrayList<String>();
+        itemList=new ArrayList<ItemSpinner>();
         final View header = findViewById(R.id.header);
         startBlock = (CheckBox) findViewById(R.id.toggel);
-
+        totalData = (TextView) findViewById(R.id.totalData);
         mScrollableLayout = findView(R.id.scrollable_layout);
         packageManager = getPackageManager();
+        settingdate=(Spinner)findViewById(R.id.settingdate);
         //list app
         databaseManager = new DatabaseManager(MainActivity.this);
+        totalData.setText(String.valueOf(databaseManager.totalLimitedDays("2016-8-10", "2016-09-16 ")));
+
         applists = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
         installedList = new ArrayList<ApplicationInforNew>();
         TreeSet<ApplicationInforNew> applicationInforNewTreeSet = new TreeSet<ApplicationInforNew>(new Comparator<ApplicationInforNew>() {
@@ -125,7 +140,7 @@ public class MainActivity extends BaseActivity {
                 }
 
 
-                header.setTranslationY(y/2);
+                header.setTranslationY(y / 2);
             }
         });
 
@@ -167,10 +182,31 @@ public class MainActivity extends BaseActivity {
             }
 
         });
-
+        itemList.add(setDays(0));
+        itemList.add(setDays(1));
+        itemList.add(setDays(2));
+        spinnerAdapter=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,itemString);
+        settingdate.setAdapter(spinnerAdapter);
     }
 
     //
+    public ItemSpinner setDays(int item) {
+        ItemSpinner itemSpinner;
+        String begining = "", end = "";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+        Calendar c = Calendar.getInstance(); // Get Calendar Instance
+        c.set(Calendar.MONTH,c.get(Calendar.MONTH)-item);
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        begining = sdf.format(c.getTime());
+
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+        end = sdf.format(c.getTime());
+        itemSpinner=new ItemSpinner(begining,end);
+        itemString.add(itemSpinner.toString());
+        Log.d("Limit days", begining + " đến " + end);
+        return itemSpinner;
+    }
 
     private void showDialog() {
         new AlertDialog.Builder(this)
@@ -211,7 +247,6 @@ public class MainActivity extends BaseActivity {
         if (listViewFragment == null) {
             listViewFragment = ListViewFragment.newInstance(MainActivity.this, installedList);
         }
-
 
 
         Collections.addAll(list, listViewFragment);
@@ -259,7 +294,6 @@ public class MainActivity extends BaseActivity {
         }
 
     }
-
 
 
 }

@@ -3,9 +3,11 @@ package com.app.hinh.smart3g.util;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.app.hinh.smart3g.R;
+import com.app.hinh.smart3g.ui.MainActivity;
 
 
 public class WarringActivity extends AppCompatActivity {
@@ -22,5 +24,9 @@ public class WarringActivity extends AppCompatActivity {
 
         finish();
         return;
+    }
+    public void openListBlock(View view){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }

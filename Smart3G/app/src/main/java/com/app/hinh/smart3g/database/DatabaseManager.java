@@ -23,8 +23,9 @@ public class DatabaseManager {
     private static final String DB_NAME = "manager3g";
     private static final String TB_DAYS = "managerdays";
     private static final String TB_TOTAL = "manager3g";
+    private static final String TB_ChooseDays="choosedays";
     private static final int DB_VERSION = 1;
-    private SQLiteDatabase database;
+    private static SQLiteDatabase database;
     private static HandlerThread hthread = null;
     private static Handler handler = null;
 
@@ -52,6 +53,9 @@ public class DatabaseManager {
     public static DatabaseManager getDatabaseManager(Context context) {
         if (databaseManager == null)
             databaseManager = new DatabaseManager(context.getApplicationContext());
+        else
+            database = OpenHelper.getInstance(context).getWritableDatabase();
+
         return databaseManager;
     }
 
@@ -88,7 +92,8 @@ public class DatabaseManager {
         @Override
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
             String creadTableDays = "CREATE TABLE IF NOT EXISTS managerdays(DATE TEXT PRIMARY KEY,DATA DOUBLE)";
-            String createTableHuors = "CREATE TABLE IF NOT EXISTS manager3g(UID INT, DATA DOUBLE)";
+            String createTableHuors = "CREATE TABLE IF NOT EXISTS manager3g(UID INT PRIMARY KEY, DATA DOUBLE)";
+            String createTableChooseDays="CREATE TABLE IF NOT EXISTS manager3g(FIRTDATE TEXT, LASTDATE TEXT)";
             sqLiteDatabase.execSQL(creadTableDays);
             sqLiteDatabase.execSQL(createTableHuors);
         }
@@ -131,6 +136,7 @@ public class DatabaseManager {
     public void close() {
         database.close();
     }
+
 
     //B5 xay dung phung thuc lam viec voi db
     public void insertManager3g(int UID, double data) {
@@ -217,4 +223,104 @@ public class DatabaseManager {
         return database.query(TB_TOTAL, null, null, null, null, null, null);
     }
 
+    public void insertManagerDays(String date,double data){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("DATE", date);
+        contentValues.put("DATA", data);
+        database.insertOrThrow(TB_DAYS, null, contentValues);
+    }
+    public void updateManagerDays(String date, double data){
+        String whereClause = "DATE = ? ";
+        String[] whereArgs = new String[]{
+                date
+        };
+        ContentValues values = new ContentValues();
+        values.put("DATA", data);
+        database.update(TB_DAYS, values,whereClause, whereArgs);
+        // do some work with the cursor here.
+
+    }
+
+    public boolean constainDate(String date) {
+        String[] tableColumns = new String[]{
+                "DATE"
+        };
+        String whereClause = "DATE = ? ";
+        String[] whereArgs = new String[]{
+                date
+        };
+        Cursor cursor = null;
+        boolean check = false;
+
+        try {
+            cursor = database.query(TB_DAYS, tableColumns, whereClause, whereArgs, null, null, null);
+            if (cursor.getCount() >= 1) {
+                check = true;
+            }
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if (cursor != null)
+                cursor.close();
+        }
+
+        return check;
+    }
+
+    public double getDataDays(String date){
+        String[] tableColumns = new String[]{
+                "DATA"
+        };
+        String whereClause = "DATE = ? ";
+        String[] whereArgs = new String[]{
+                String.valueOf(date)
+        };
+        Cursor cursor = null;
+        double data = 0;
+        try {
+            cursor = database.query(TB_DAYS, tableColumns, whereClause, whereArgs, null, null, null);
+            cursor.moveToFirst();
+            data = cursor.getDouble(0);
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if (cursor != null)
+                cursor.close();
+        }
+
+        return data;
+
+    }
+
+    public Cursor getListManagerDays(){
+        return database.query(TB_DAYS, null, null, null, null, null, null);
+
+    }
+    public double totalLimitedDays(String firtday,String lastday){
+        String[] tableColumns = new String[]{
+                "DATA"
+        };
+        String whereClause = "? <=DATE <= ? ";
+        String[] whereArgs = new String[]{
+                firtday,lastday
+        };
+        Cursor cursor = null;
+        double data = 0;
+        try {
+            cursor = database.query(TB_DAYS, tableColumns, whereClause, whereArgs, null, null, null);
+            if (cursor.getCount()==0)
+                return data;
+            while (cursor.moveToNext()){
+                data+=cursor.getDouble(0);
+            }
+            // do some work with the cursor here.
+        } finally {
+            // this gets called even if there is an exception somewhere above
+            if (cursor != null)
+                cursor.close();
+        }
+        Log.d("data1",String.valueOf(data));
+        return data;
+
+    }
 }

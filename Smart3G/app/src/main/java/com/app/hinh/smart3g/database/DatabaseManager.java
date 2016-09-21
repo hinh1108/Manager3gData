@@ -11,6 +11,9 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by hinh1 on 7/23/2016.
@@ -23,7 +26,7 @@ public class DatabaseManager {
     private static final String DB_NAME = "manager3g";
     private static final String TB_DAYS = "managerdays";
     private static final String TB_TOTAL = "manager3g";
-    private static final String TB_ChooseDays="choosedays";
+    private static final String TB_LIMITDATA="limitdata";
     private static final int DB_VERSION = 1;
     private static SQLiteDatabase database;
     private static HandlerThread hthread = null;
@@ -93,9 +96,10 @@ public class DatabaseManager {
         public void onCreate(SQLiteDatabase sqLiteDatabase) {
             String creadTableDays = "CREATE TABLE IF NOT EXISTS managerdays(DATE TEXT PRIMARY KEY,DATA DOUBLE)";
             String createTableHuors = "CREATE TABLE IF NOT EXISTS manager3g(UID INT PRIMARY KEY, DATA DOUBLE)";
-            String createTableChooseDays="CREATE TABLE IF NOT EXISTS manager3g(FIRTDATE TEXT, LASTDATE TEXT)";
+            String createTableLimitData="CREATE TABLE IF NOT EXISTS limitdata(START TEXT,DATA DOUBLE)";
             sqLiteDatabase.execSQL(creadTableDays);
             sqLiteDatabase.execSQL(createTableHuors);
+            sqLiteDatabase.execSQL(createTableLimitData);
         }
 
         @Override
@@ -103,6 +107,7 @@ public class DatabaseManager {
             //thuc hien viec upgrade
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS managerdays");
             sqLiteDatabase.execSQL("DROP TABLE IF EXISTS manager3g");
+            sqLiteDatabase.execSQL("DROP TABLE IF EXISTS limitdata");
             onCreate(sqLiteDatabase);
         }
 
@@ -223,7 +228,7 @@ public class DatabaseManager {
         return database.query(TB_TOTAL, null, null, null, null, null, null);
     }
 
-    public void insertManagerDays(String date,double data){
+    public void insertManagerDays(String date, double data){
         ContentValues contentValues = new ContentValues();
         contentValues.put("DATE", date);
         contentValues.put("DATA", data);
@@ -297,24 +302,40 @@ public class DatabaseManager {
 
     }
     public double totalLimitedDays(String firtday,String lastday){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
         String[] tableColumns = new String[]{
-                "DATA"
+                "DATE","DATA"
         };
-        String whereClause = "? <=DATE <= ? ";
-        String[] whereArgs = new String[]{
-                firtday,lastday
-        };
+
         Cursor cursor = null;
         double data = 0;
         try {
-            cursor = database.query(TB_DAYS, tableColumns, whereClause, whereArgs, null, null, null);
+            Date firtdate=formatter.parse(firtday);
+            Date lastdate=formatter.parse(lastday);
+            cursor = database.query(TB_DAYS, tableColumns, null, null, null, null, null);
+            Log.d("count now",String.valueOf(cursor.getCount()));
+
             if (cursor.getCount()==0)
                 return data;
             while (cursor.moveToNext()){
-                data+=cursor.getDouble(0);
+                Log.d("day now",cursor.getString(0));
+                String date=cursor.getString(0);
+                if (formatter.parse(date).before(lastdate)||
+                        formatter.parse(date).equals(lastdate)&&
+                        formatter.parse(date).after(firtdate)||
+                        formatter.parse(date).equals(firtdate)){
+                    data+=cursor.getDouble(1);
+                }
+
+
             }
             // do some work with the cursor here.
-        } finally {
+        }
+        catch (ParseException e) {
+            e.printStackTrace();
+        }
+        finally {
             // this gets called even if there is an exception somewhere above
             if (cursor != null)
                 cursor.close();
@@ -322,5 +343,27 @@ public class DatabaseManager {
         Log.d("data1",String.valueOf(data));
         return data;
 
+    }
+// table limitdata
+    public Cursor getLimitData(){
+        String[] tableColumns = new String[]{
+                "START","DATA"
+        };
+
+        return database.query(TB_LIMITDATA, tableColumns, null, null, null, null, null);
+    }
+
+    public void insertTableLimit(String start,Double data){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("START", start);
+        contentValues.put("DATA", data);
+        database.insertOrThrow(TB_LIMITDATA, null, contentValues);
+    }
+
+    public void updateTableLimit(String start,Double data){
+        ContentValues values = new ContentValues();
+        values.put("START", start);
+        values.put("DATA", data);
+        database.update(TB_LIMITDATA, values,null, null );
     }
 }

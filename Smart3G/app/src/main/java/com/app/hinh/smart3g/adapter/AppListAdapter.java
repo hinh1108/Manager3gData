@@ -1,21 +1,26 @@
 package com.app.hinh.smart3g.adapter;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.app.hinh.smart3g.R;
 import com.app.hinh.smart3g.model.ApplicationInforNew;
 import com.app.hinh.smart3g.util.BlockUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,7 @@ public class AppListAdapter extends BaseAdapter {
     private LayoutInflater layoutInflater;
     private double dataMB=0;
     private double dataKB=0;
+    private double maxData=0;
     public AppListAdapter(Context instance, int item_istall_apilication, List<ApplicationInforNew> installedList, ArrayList<String> checkedList) {
         mInstance = instance;
 
@@ -53,6 +59,7 @@ public class AppListAdapter extends BaseAdapter {
         return arg0;
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @SuppressWarnings("deprecation")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -67,12 +74,18 @@ public class AppListAdapter extends BaseAdapter {
             holder.textView = (TextView) convertView.findViewById(R.id.tvAppName);
             holder.imageView = (ImageView) convertView.findViewById(R.id.iconApp);
             holder.tvData=(TextView) convertView.findViewById((R.id.tvData));
+            holder.drawline=(LinearLayout) convertView.findViewById(R.id.drawLine);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        //LinearLayout.LayoutParams layParamsGet= (LinearLayout.LayoutParams) holder.layoutView.getLayoutParams();
         final ApplicationInforNew applicationInforNew = mInstalledList.get(position);
+        LinearLayout.LayoutParams params=(LinearLayout.LayoutParams)holder.drawline.getLayoutParams();
+        params.weight= (float) (applicationInforNew.getData()/maxData());
+        holder.drawline.setLayoutParams(params);
+
         holder.textView.setText(applicationInforNew.getApplicationInfo().loadLabel(mInstance.getPackageManager()).toString());
 
         String a=applicationInforNew.getApplicationInfo().loadLabel(mInstance.getPackageManager()).toString();
@@ -86,12 +99,13 @@ public class AppListAdapter extends BaseAdapter {
 
         holder.imageView.setImageBitmap( bitmap);
         if (applicationInforNew.getData()/(1024*1024)>=1){
-            dataMB=(Math.round((applicationInforNew.getData()/(1024*1024))*100))/100;
+
+            dataMB=round(applicationInforNew.getData()/(1024*1024),2);
             holder.tvData.setText(String.valueOf(dataMB)+" MB");
 
         }
         else {
-            dataKB=Math.round(applicationInforNew.getData()/(1024));
+            dataKB=round(applicationInforNew.getData()/(1024),2);
             holder.tvData.setText(String.valueOf(dataKB)+" KB");
 
         }
@@ -130,6 +144,17 @@ public class AppListAdapter extends BaseAdapter {
         return convertView;
     }
 
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+    public double maxData(){
+        maxData=mInstalledList.get(0).getData();
+        return maxData;
+    }
     public void updateCheckedList(ApplicationInforNew applicationInforNew){
         if (contains(mCheckedList, applicationInforNew)) {
             remove(mCheckedList, applicationInforNew);
@@ -175,5 +200,6 @@ public class AppListAdapter extends BaseAdapter {
         public TextView textView;
         public ImageView imageView;
         public TextView tvData;
+        public LinearLayout drawline;
     }
 }

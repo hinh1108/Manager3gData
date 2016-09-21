@@ -5,15 +5,21 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +35,8 @@ import com.app.hinh.smart3g.service.CoreSevice;
 import com.app.hinh.smart3g.util.BlockUtils;
 import com.app.hinh.smart3g.util.TopActivityUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,9 +61,12 @@ public class MainActivity extends BaseActivity {
     private PackageManager packageManager = null;
     private CheckBox startBlock;
     private TextView totalData;
+    //private TextView limitdata;
     private ArrayList<ItemSpinner> itemList;
     private ArrayList<String> itemString;
     private Spinner settingdate;
+    private ImageView app1,app2,app3;
+    private TextView countApp;
     private ArrayAdapter<String> spinnerAdapter;
 
     @Override
@@ -64,47 +75,28 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         itemString=new ArrayList<String>();
         itemList=new ArrayList<ItemSpinner>();
+        app1=(ImageView)findViewById(R.id.app1);
+        app2=(ImageView)findViewById(R.id.app2);
+        app3=(ImageView)findViewById(R.id.app3);
+        countApp=(TextView)findViewById(R.id.countApp);
         final View header = findViewById(R.id.header);
         startBlock = (CheckBox) findViewById(R.id.toggel);
         totalData = (TextView) findViewById(R.id.totalData);
+        //limitdata=(TextView)findViewById(R.id.limitdata);
         mScrollableLayout = findView(R.id.scrollable_layout);
         packageManager = getPackageManager();
         settingdate=(Spinner)findViewById(R.id.settingdate);
         //list app
         databaseManager = new DatabaseManager(MainActivity.this);
-        totalData.setText(String.valueOf(databaseManager.totalLimitedDays("2016-8-10", "2016-09-16 ")));
-
         applists = checkForLaunchIntent(packageManager.getInstalledApplications(PackageManager.GET_META_DATA));
         installedList = new ArrayList<ApplicationInforNew>();
-        TreeSet<ApplicationInforNew> applicationInforNewTreeSet = new TreeSet<ApplicationInforNew>(new Comparator<ApplicationInforNew>() {
-            @Override
-            public int compare(ApplicationInforNew a1, ApplicationInforNew a2) {
-                return a1.compareTo(a2);
-            }
-        });
-        double data = 0;
-        ApplicationInforNew applicationInforNew;
-        for (ApplicationInfo applicationInfo : applists) {
 
+        updateApps();
 
-            if (!databaseManager.constain(applicationInfo.uid)) {
-                data = 0;
-                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
-                databaseManager.insertManager3g(applicationInfo.uid, data);
-                //installedList.add(applicationInforNew);
-                applicationInforNewTreeSet.add(applicationInforNew);
-
-            } else {
-                data = databaseManager.dataUID(applicationInfo.uid);
-                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
-                //installedList.add(applicationInforNew);
-                applicationInforNewTreeSet.add(applicationInforNew);
-
-            }
-        }
-        Log.d("size tree set", String.valueOf(applicationInforNewTreeSet.size()));
-
-        sortAppData(applicationInforNewTreeSet);
+        countApp.setText(String.valueOf(installedList.size()));
+        app1.setImageBitmap(updateTopApp(0));
+        app2.setImageBitmap(updateTopApp(1));
+        app3.setImageBitmap(updateTopApp(2));
 
 
         Cursor cursor = databaseManager.getListManager3g();
@@ -187,8 +179,103 @@ public class MainActivity extends BaseActivity {
         itemList.add(setDays(2));
         spinnerAdapter=new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,itemString);
         settingdate.setAdapter(spinnerAdapter);
+        //totalData.setText(String.valueOf(databaseManager.totalLimitedDays(itemList.get(settingdate.getSelectedItemPosition()).getStartDays(),itemList.get(settingdate.getSelectedItemPosition()).getEndDays())));
+       settingdate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+           @Override
+           public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+               totalData.setText(String.valueOf(round(databaseManager.totalLimitedDays(itemList.get(i).getStartDays(),itemList.get(i).getEndDays())/(1024*1024*1024),2))+" GB");
+
+           }
+
+           @Override
+           public void onNothingSelected(AdapterView<?> adapterView) {
+
+           }
+       });
+        //limit data
+        if(databaseManager.getLimitData().getCount()==0){
+            databaseManager.insertTableLimit("true", (double) 1);
+            databaseManager.getLimitData().close();
+        }
+        Cursor cursor1=databaseManager.getLimitData();
+        cursor1.moveToFirst();
+        //limitdata.setText(String.valueOf(cursor1.getDouble(1))+" GB");
+        //setMobileDataEnabled(MainActivity.this,false);
+
     }
 
+    public  void updateApps(){
+
+        TreeSet<ApplicationInforNew> applicationInforNewTreeSet = new TreeSet<ApplicationInforNew>(new Comparator<ApplicationInforNew>() {
+            @Override
+            public int compare(ApplicationInforNew a1, ApplicationInforNew a2) {
+                return a1.compareTo(a2);
+            }
+        });
+        double data = 0;
+        ApplicationInforNew applicationInforNew;
+        for (ApplicationInfo applicationInfo : applists) {
+
+
+            if (!databaseManager.constain(applicationInfo.uid)) {
+                data = 0;
+                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
+                databaseManager.insertManager3g(applicationInfo.uid, data);
+                //installedList.add(applicationInforNew);
+                applicationInforNewTreeSet.add(applicationInforNew);
+
+            } else {
+                data = databaseManager.dataUID(applicationInfo.uid);
+                applicationInforNew = new ApplicationInforNew(applicationInfo, data);
+                //installedList.add(applicationInforNew);
+                applicationInforNewTreeSet.add(applicationInforNew);
+
+            }
+        }
+        Log.d("size tree set", String.valueOf(applicationInforNewTreeSet.size()));
+
+        sortAppData(applicationInforNewTreeSet);
+    }
+    public Bitmap updateTopApp(int i){
+        //app.icon;
+        Bitmap bitmap=Bitmap.createScaledBitmap(
+                ((BitmapDrawable) installedList.get(i).getApplicationInfo().loadIcon(MainActivity.this.getPackageManager())).getBitmap(), 30, 30, true);
+        return bitmap;
+    }
+    //round data
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+   /* private void setMobileDataEnabled(Context context, boolean enabled) {
+        final ConnectivityManager conman = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final Class conmanClass;
+        try {
+            conmanClass = Class.forName(conman.getClass().getName());
+            final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
+            iConnectivityManagerField.setAccessible(true);
+            final Object iConnectivityManager = iConnectivityManagerField.get(conman);
+            final Class iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
+            final Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
+            setMobileDataEnabledMethod.setAccessible(true);
+
+            setMobileDataEnabledMethod.invoke(iConnectivityManager, enabled);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+    }*/
     //
     public ItemSpinner setDays(int item) {
         ItemSpinner itemSpinner;
@@ -212,7 +299,7 @@ public class MainActivity extends BaseActivity {
         new AlertDialog.Builder(this)
                 .setTitle("NOTE")
                 .setMessage("Android 5.0 trở lên không cho phép quyền truy cập ứng dụng mời bạn vào cài đặt thiết lập lại quyền")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                .setPositiveButton("OK",new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         try {
@@ -295,5 +382,30 @@ public class MainActivity extends BaseActivity {
 
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.itemSettingWifi:
+                Toast.makeText(MainActivity.this,"Wifi",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.itemSeacher:
+                Toast.makeText(MainActivity.this,"Seacher",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.itemAbout:
+                Toast.makeText(MainActivity.this,"About",Toast.LENGTH_LONG).show();
+                break;
+            case R.id.itemHelp:
+                Toast.makeText(MainActivity.this,"Help",Toast.LENGTH_LONG).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

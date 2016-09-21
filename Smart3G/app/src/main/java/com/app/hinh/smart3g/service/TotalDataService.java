@@ -1,8 +1,10 @@
 package com.app.hinh.smart3g.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.TrafficStats;
 import android.os.Handler;
 import android.os.IBinder;
@@ -11,6 +13,8 @@ import android.util.Log;
 
 import com.app.hinh.smart3g.database.DatabaseManager;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -86,7 +90,7 @@ public class TotalDataService extends Service {
     //updata data managerdays
     public void updateManagerDays(){
         Calendar calendar= Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String date = df.format(calendar.getTime());
 
         Log.d("Date time",date);
@@ -201,4 +205,22 @@ public class TotalDataService extends Service {
         database.update(TB_TOTAL,values,"UID="+UID,null);
     }
  */
+ public void mobiledataenable(boolean enabled) {
+
+     try {
+         final ConnectivityManager conman = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+         final Class<?> conmanClass = Class.forName(conman.getClass().getName());
+         final Field iConnectivityManagerField = conmanClass.getDeclaredField("mService");
+         iConnectivityManagerField.setAccessible(true);
+         final Object iConnectivityManager = iConnectivityManagerField.get(conman);
+         final Class<?> iConnectivityManagerClass = Class.forName(iConnectivityManager.getClass().getName());
+         final Method setMobileDataEnabledMethod = iConnectivityManagerClass.getDeclaredMethod("setMobileDataEnabled", Boolean.TYPE);
+         setMobileDataEnabledMethod.setAccessible(true);
+         setMobileDataEnabledMethod.invoke(iConnectivityManager, enabled);
+     }
+     catch (Exception e)
+     {
+         e.printStackTrace();
+     }
+ }
 }

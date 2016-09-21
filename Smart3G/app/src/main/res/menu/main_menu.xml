@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="Setting"
+        android:id="@+id/itemSetting">
+        <menu>
+            <item
+                android:title="Wifi"
+                android:id="@+id/itemSettingWifi"/>
+            <item
+                android:title="Sound"
+                android:id="@+id/itemSettingSound"/>
+        </menu>
+    </item>
+    <item
+        android:title="Seacher"
+        android:id="@+id/itemSeacher"/>
+    <item
+        android:title="About"
+        android:id="@+id/itemAbout"/>
+    <item
+        android:title="Help"
+        android:id="@+id/itemHelp"/>
+</menu>
